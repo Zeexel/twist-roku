@@ -4,14 +4,14 @@
     <LabelList
       id = "AnimeList"
       translation = "[90,50]"
-      itemSize = "[440,48]"
+      itemSize = "[500,48]"
       visible = "false">
       <ContentNode role="content"></ContentNode>
     </LabelList>
     <LabelList
       id = "EpisodeList"
       translation = "[600,50]"
-      itemSize = "[100,48]"
+      itemSize = "[200,48]"
       visible = "false">
       <ContentNode role="content"></ContentNode>
     </LabelList>

@@ -22,12 +22,13 @@ sub showAnimeList()
   m.AnimeList.visible = "true"
   m.animeListPopulated = true
   m.AnimeList.setFocus(true)
+  m.AnimeList.observeField("itemSelected", "selectAnime")
 end sub
 
-sub selectAnime()
-  print "Trying to populate episode list for current anime!"
+function selectAnime(obj)
+  print "Trying to populate episode list for selected anime!"
 
-  currentAnimeSlug = m.AnimeList.content.getChild(m.AnimeList.itemFocused).twist_data.slug.slug
+  currentAnimeSlug = m.AnimeList.content.getChild(obj.getData()).twist_data.slug.slug
 
   m.getAnimeEpisodes = createObject("roSGNode", "twistApiCall")
   m.getAnimeEpisodes.setField("url", "https://twist.moe/api/anime/" + currentAnimeSlug + "/sources")
@@ -36,7 +37,7 @@ sub selectAnime()
   m.getAnimeEpisodes.setField("title_prefix", "Episode ")
   m.getAnimeEpisodes.observeField("content", "showEpisodeList")
   m.getAnimeEpisodes.control = "RUN"
-end sub
+end function
 
 sub showEpisodeList()
   m.EpisodeList.content = m.getAnimeEpisodes.content
@@ -51,14 +52,8 @@ function onKeyEvent(key as String, press as Boolean) as Boolean
   end if
   if press = true
     if m.AnimeList.hasFocus() = true
-      if key = "OK"
-        selectAnime()
-        return true
-      end if
+      
     end if
   end if
   return false
 end function
-
-
-' note: hasFocus() to check focus
