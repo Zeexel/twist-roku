@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="AnimeSelector" extends="Scene">
+  <children>
+    <LabelList
+      id = "AnimeList"
+      translation = "[90,50]"
+      itemSize = "[440,48]"
+      visible = "false">
+      <ContentNode role="content"></ContentNode>
+    </LabelList>
+    <LabelList
+      id = "EpisodeList"
+      translation = "[600,50]"
+      itemSize = "[100,48]"
+      visible = "false">
+      <ContentNode role="content"></ContentNode>
+    </LabelList>
+  </children>
+
+  <script type="text/brightscript" uri="pkg:/components/AnimeSelector.brs"/>
+</component>

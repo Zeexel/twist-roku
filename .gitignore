@@ -1,0 +1,6 @@
+# misc
+ignore
+make
+
+# compiled app files
+twist/dist
