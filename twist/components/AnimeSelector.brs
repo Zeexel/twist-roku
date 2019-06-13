@@ -2,7 +2,7 @@ sub init()
   m.MenuOptions = m.top.findNode("MenuOptions")
   m.AnimeList = m.top.findNode("AnimeList")
   m.EpisodeList = m.top.findNode("EpisodeList")
-  m.currentList = 0 'MenuOptions=0, AnimeList=1, EpisodeList=2
+  m.currentList = "MenuOptions"
 
   m.MenuOptions.observeField("itemSelected", "selectMenuOption")
   m.MenuOptions.setFocus(true)
@@ -29,7 +29,7 @@ end sub
 sub showAnimeList()
   m.AnimeList.content = m.getAnimeList.content
   m.AnimeList.visible = "true"
-  m.currentList = 1
+  m.currentList = "AnimeList"
   m.AnimeList.setFocus(true)
   m.AnimeList.observeField("itemSelected", "selectAnime")
 end sub
@@ -51,24 +51,24 @@ end function
 sub showEpisodeList()
   m.EpisodeList.content = m.getAnimeEpisodes.content
   m.EpisodeList.visible = "true"
-  m.currentList = 2
+  m.currentList = "EpisodeList"
   m.EpisodeList.setFocus(true)
 end sub
 
 sub scrollRight() as Boolean
-  if m.currentList = 0
+  if m.currentList = "MenuOptions"
     if m.AnimeList.visible = false
       return false
     end if
-    m.currentList = 1
+    m.currentList = "AnimeList"
     m.AnimeList.setFocus(true)
     return true
   end if
-  if m.currentList = 1
+  if m.currentList = "AnimeList"
     if m.EpisodeList.visible = false
       return false
     end if
-    m.currentList = 2
+    m.currentList = "EpisodeList"
     m.EpisodeList.setFocus(true)
     return true
   end if
@@ -76,13 +76,13 @@ sub scrollRight() as Boolean
 end sub
 
 sub scrollLeft() as Boolean
-  if m.currentList = 1
-    m.currentList = 0
+  if m.currentList = "AnimeList"
+    m.currentList = "MenuOptions"
     m.MenuOptions.setFocus(true)
     return true
   end if
-  if m.currentList = 2
-    m.currentList = 1
+  if m.currentList = "EpisodeList"
+    m.currentList = "AnimeList"
     m.AnimeList.setFocus(true)
     return true
   end if
