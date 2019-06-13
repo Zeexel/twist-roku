@@ -1,10 +1,19 @@
 sub init()
+  m.MenuOptions = m.top.findNode("MenuOptions")
   m.AnimeList = m.top.findNode("AnimeList")
   m.EpisodeList = m.top.findNode("EpisodeList")
-  m.animeListPopulated = false
+  m.currentList = 0 'MenuOptions=0, AnimeList=1, EpisodeList=2
 
-  populateAnimeList()
+  m.MenuOptions.observeField("itemSelected", "selectMenuOption")
+  m.MenuOptions.setFocus(true)
 end sub
+
+function selectMenuOption(selection)
+  if m.MenuOptions.content.getChild(selection.getData()).title = "Browse"
+    m.MenuOptions.setFocus(false)
+    populateAnimeList()
+  end if
+end function
 
 sub populateAnimeList()
   print "Trying to populate anime list!"
@@ -20,15 +29,15 @@ end sub
 sub showAnimeList()
   m.AnimeList.content = m.getAnimeList.content
   m.AnimeList.visible = "true"
-  m.animeListPopulated = true
+  m.currentList = 1
   m.AnimeList.setFocus(true)
   m.AnimeList.observeField("itemSelected", "selectAnime")
 end sub
 
-function selectAnime(obj)
+function selectAnime(selection)
   print "Trying to populate episode list for selected anime!"
 
-  currentAnimeSlug = m.AnimeList.content.getChild(obj.getData()).twist_data.slug.slug
+  currentAnimeSlug = m.AnimeList.content.getChild(selection.getData()).twist_data.slug.slug
 
   m.getAnimeEpisodes = createObject("roSGNode", "twistApiCall")
   m.getAnimeEpisodes.setField("url", "https://twist.moe/api/anime/" + currentAnimeSlug + "/sources")
@@ -42,17 +51,53 @@ end function
 sub showEpisodeList()
   m.EpisodeList.content = m.getAnimeEpisodes.content
   m.EpisodeList.visible = "true"
+  m.currentList = 2
   m.EpisodeList.setFocus(true)
+end sub
+
+sub scrollRight() as Boolean
+  if m.currentList = 0
+    if m.AnimeList.visible = false
+      return false
+    end if
+    m.currentList = 1
+    m.AnimeList.setFocus(true)
+    return true
+  end if
+  if m.currentList = 1
+    if m.EpisodeList.visible = false
+      return false
+    end if
+    m.currentList = 2
+    m.EpisodeList.setFocus(true)
+    return true
+  end if
+  return false
+end sub
+
+sub scrollLeft() as Boolean
+  if m.currentList = 1
+    m.currentList = 0
+    m.MenuOptions.setFocus(true)
+    return true
+  end if
+  if m.currentList = 2
+    m.currentList = 1
+    m.AnimeList.setFocus(true)
+    return true
+  end if
+  return false
 end sub
 
 function onKeyEvent(key as String, press as Boolean) as Boolean
   print "Key pressed: "; key; " "; press
-  if m.animeListPopulated = false
-    return false
-  end if
   if press = true
-    if m.AnimeList.hasFocus() = true
-      
+    if key = "left"
+      scrollLeft()
+      return true
+    else if key = "right"
+      scrollRight()
+      return true
     end if
   end if
   return false

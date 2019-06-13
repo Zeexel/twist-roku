@@ -2,16 +2,26 @@
 <component name="AnimeSelector" extends="Scene">
   <children>
     <LabelList
+      id = "MenuOptions"
+      translation = "[70,60]"
+      itemSize = "[300,80]"
+      visible = "true">
+      <ContentNode role="content">
+        <ContentNode title="Browse" />
+        <ContentNode title="Search" />
+      </ContentNode>
+    </LabelList>
+    <LabelList
       id = "AnimeList"
-      translation = "[90,50]"
-      itemSize = "[500,48]"
+      translation = "[430,60]"
+      itemSize = "[550,48]"
       visible = "false">
       <ContentNode role="content"></ContentNode>
     </LabelList>
     <LabelList
       id = "EpisodeList"
-      translation = "[600,50]"
-      itemSize = "[200,48]"
+      translation = "[1040,60]"
+      itemSize = "[170,48]"
       visible = "false">
       <ContentNode role="content"></ContentNode>
     </LabelList>
