@@ -25,7 +25,12 @@
       visible = "false">
       <ContentNode role="content"></ContentNode>
     </LabelList>
+    <VideoOverlay
+      id = "VideoOverlay"
+      visible = "false"
+    />
   </children>
 
+  <script type="text/brightscript" uri="pkg:/components/sourceDecrypt.brs"/>
   <script type="text/brightscript" uri="pkg:/components/AnimeSelector.brs"/>
 </component>

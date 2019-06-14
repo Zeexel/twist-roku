@@ -1,8 +1,13 @@
 sub init()
+  ' AnimeSelector nodes
   m.MenuOptions = m.top.findNode("MenuOptions")
   m.AnimeList = m.top.findNode("AnimeList")
   m.EpisodeList = m.top.findNode("EpisodeList")
   m.currentList = "MenuOptions"
+
+  ' VideoOverlay nodes
+  m.VideoOverlay = m.top.findNode("VideoOverlay")
+  m.VideoActions = m.top.findNode("VideoActions")
 
   m.MenuOptions.observeField("itemSelected", "selectMenuOption")
   m.MenuOptions.setFocus(true)
@@ -28,9 +33,8 @@ end sub
 
 sub showAnimeList()
   m.AnimeList.content = m.getAnimeList.content
-  m.AnimeList.visible = "true"
-  m.currentList = "AnimeList"
-  m.AnimeList.setFocus(true)
+  m.AnimeList.visible = true
+  focusAnimeList()
   m.AnimeList.observeField("itemSelected", "selectAnime")
 end sub
 
@@ -50,7 +54,31 @@ end function
 
 sub showEpisodeList()
   m.EpisodeList.content = m.getAnimeEpisodes.content
-  m.EpisodeList.visible = "true"
+  m.EpisodeList.visible = true
+  focusEpisodeList()
+  m.EpisodeList.observeField("itemSelected", "selectEpisode")
+end sub
+
+function selectEpisode(selection)
+  source_encrypted = m.EpisodeList.content.getChild(selection.getData()).twist_data.source
+  source = "https://twist.moe" + decryptSource(source_encrypted)
+
+  m.VideoOverlay.videoUrl = source
+  m.VideoOverlay.visible = true
+  m.VideoActions.setFocus(true)
+end function
+
+sub focusMenuOptions()
+  m.currentList = "MenuOptions"
+  m.MenuOptions.setFocus(true)
+end sub
+
+sub focusAnimeList()
+  m.currentList = "AnimeList"
+  m.AnimeList.setFocus(true)
+end sub
+
+sub focusEpisodeList()
   m.currentList = "EpisodeList"
   m.EpisodeList.setFocus(true)
 end sub
@@ -60,16 +88,14 @@ sub scrollRight() as Boolean
     if m.AnimeList.visible = false
       return false
     end if
-    m.currentList = "AnimeList"
-    m.AnimeList.setFocus(true)
+    focusAnimeList()
     return true
   end if
   if m.currentList = "AnimeList"
     if m.EpisodeList.visible = false
       return false
     end if
-    m.currentList = "EpisodeList"
-    m.EpisodeList.setFocus(true)
+    focusEpisodeList()
     return true
   end if
   return false
@@ -77,13 +103,11 @@ end sub
 
 sub scrollLeft() as Boolean
   if m.currentList = "AnimeList"
-    m.currentList = "MenuOptions"
-    m.MenuOptions.setFocus(true)
+    focusMenuOptions()
     return true
   end if
   if m.currentList = "EpisodeList"
-    m.currentList = "AnimeList"
-    m.AnimeList.setFocus(true)
+    focusAnimeList()
     return true
   end if
   return false
