@@ -22,7 +22,13 @@ function maybeExit(selection)
     m.top.exit = true
   else
     m.ExitWarning.visible = false
-    m.MenuOptions.setFocus(true)  ' find way to go back to original focus
+    if m.currentList = "MenuOptions"
+      m.MenuOptions.setFocus(true)
+    else if m.currentList = "AnimeList"
+      m.AnimeList.setFocus(true)
+    else if m.currentList = "EpisodeList"
+      m.EpisodeList.setFocus(true)
+    end if
   end if
 end function
 
@@ -144,6 +150,7 @@ function onKeyEvent(key as String, press as Boolean) as Boolean
         return true
       else
         m.ExitWarning.visible = true
+        m.ExitWarning.focusButton = 0  ' focus OK button
         m.ExitWarning.setFocus(true)
         return true
       end if
