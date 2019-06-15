@@ -41,6 +41,7 @@
     <field id="exit" type="boolean" value="false" />
   </interface>
 
+  <script type="text/brightscript" uri="pkg:/components/dataHelper.brs"/>
   <script type="text/brightscript" uri="pkg:/components/sourceDecrypt.brs"/>
   <script type="text/brightscript" uri="pkg:/components/AnimeSelector.brs"/>
 </component>

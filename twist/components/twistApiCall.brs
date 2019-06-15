@@ -4,7 +4,6 @@ end sub
 
 sub getContent()
   print "Querying AnimeTwist API at "; m.top.url
-  content = createObject("roSGNode", "ContentNode")
 
   url = createObject("roUrlTransfer")
   url.SetCertificatesFile("common:/certs/ca-bundle.crt")
@@ -17,18 +16,23 @@ sub getContent()
   response = parseJSON(url.GetToString())
 
   for each item in response
-    listitem = content.createChild("ContentNode")
-    listitem.addFields({ "twist_data" : item })
+    contentItem = createObject("RoSGNode", "ContentNode")
+
+    contentItem.id = item.id  ' assume there will be an id field
 
     itemTitle = item[m.top.title_field]
     if type(itemTitle) = "String"
-      listitem.title = m.top.title_prefix + itemTitle
+      contentItem.title = m.top.title_prefix + itemTitle
     else if type(itemTitle) = "Integer"
-      listitem.title = m.top.title_prefix + StrI(itemTitle)
+      contentItem.title = m.top.title_prefix + StrI(itemTitle)
+    else
+      contentItem.title = "Error parsing API data"
     end if
+
+    item.contentItem = contentItem
   end for
 
-  m.top.content = content
+  m.top.response = response
 
   print "Done with API call!"
 end sub

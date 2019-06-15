@@ -6,7 +6,7 @@
     <field id = "token" type = "string" />
     <field id = "title_field" type = "string" />
     <field id = "title_prefix" type = "string" />
-    <field id = "content" type = "node" />
+    <field id = "response" type = "array" />
   </interface>
 
   <script type="text/brightscript" uri="pkg:/components/twistApiCall.brs"/>

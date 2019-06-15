@@ -13,6 +13,8 @@ sub init()
 
   m.currentList = "MenuOptions"
 
+  ' note: m.AnimeArray and m.EpisodeArray are set upon AnimeList and EpisodeList loading
+
   m.MenuOptions.observeField("itemSelected", "selectMenuOption")
   m.MenuOptions.setFocus(true)
 end sub
@@ -46,12 +48,13 @@ sub populateAnimeList()
   m.getAnimeList.setField("url", "https://twist.moe/api/anime")
   m.getAnimeList.setField("token", "1rj2vRtegS8Y60B3w3qNZm5T2Q0TN2NR")
   m.getAnimeList.setField("title_field", "title")
-  m.getAnimeList.observeField("content", "showAnimeList")
+  m.getAnimeList.observeField("response", "showAnimeList")
   m.getAnimeList.control = "RUN"
 end sub
 
 sub showAnimeList()
-  m.AnimeList.content = m.getAnimeList.content
+  m.AnimeArray = m.getAnimeList.response
+  accumulateContentNodes(m.AnimeList.content, m.AnimeArray)
   m.AnimeList.visible = true
   focusAnimeList()
   m.AnimeList.observeField("itemSelected", "selectAnime")
@@ -60,26 +63,27 @@ end sub
 function selectAnime(selection)
   print "Trying to populate episode list for selected anime!"
 
-  currentAnimeSlug = m.AnimeList.content.getChild(selection.getData()).twist_data.slug.slug
+  currentAnimeSlug = findItemFromLabelList(m.AnimeList, selection.getData(), m.AnimeArray).slug.slug
 
   m.getAnimeEpisodes = createObject("roSGNode", "twistApiCall")
   m.getAnimeEpisodes.setField("url", "https://twist.moe/api/anime/" + currentAnimeSlug + "/sources")
   m.getAnimeEpisodes.setField("token", "1rj2vRtegS8Y60B3w3qNZm5T2Q0TN2NR")
   m.getAnimeEpisodes.setField("title_field", "number")
   m.getAnimeEpisodes.setField("title_prefix", "Episode ")
-  m.getAnimeEpisodes.observeField("content", "showEpisodeList")
+  m.getAnimeEpisodes.observeField("response", "showEpisodeList")
   m.getAnimeEpisodes.control = "RUN"
 end function
 
 sub showEpisodeList()
-  m.EpisodeList.content = m.getAnimeEpisodes.content
+  m.EpisodeArray = m.getAnimeEpisodes.response
+  accumulateContentNodes(m.EpisodeList.content, m.EpisodeArray)
   m.EpisodeList.visible = true
   focusEpisodeList()
   m.EpisodeList.observeField("itemSelected", "selectEpisode")
 end sub
 
 function selectEpisode(selection)
-  source_encrypted = m.EpisodeList.content.getChild(selection.getData()).twist_data.source
+  source_encrypted = findItemFromLabelList(m.EpisodeList, selection.getData(), m.EpisodeArray).source
   source = "https://twist.moe" + decryptSource(source_encrypted)
 
   m.VideoOverlay.videoUrl = source
