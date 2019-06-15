@@ -3,15 +3,28 @@ sub init()
   m.MenuOptions = m.top.findNode("MenuOptions")
   m.AnimeList = m.top.findNode("AnimeList")
   m.EpisodeList = m.top.findNode("EpisodeList")
-  m.currentList = "MenuOptions"
+  m.ExitWarning = m.top.findNode("ExitWarning")
+  m.ExitWarning.buttons = ["OK", "Cancel"]
+  m.ExitWarning.observeField("buttonSelected", "maybeExit")
 
   ' VideoOverlay nodes
   m.VideoOverlay = m.top.findNode("VideoOverlay")
   m.VideoActions = m.top.findNode("VideoActions")
 
+  m.currentList = "MenuOptions"
+
   m.MenuOptions.observeField("itemSelected", "selectMenuOption")
   m.MenuOptions.setFocus(true)
 end sub
+
+function maybeExit(selection)
+  if m.ExitWarning.buttons[selection.getData()] = "OK"
+    m.top.exit = true
+  else
+    m.ExitWarning.visible = false
+    m.MenuOptions.setFocus(true)  ' find way to go back to original focus
+  end if
+end function
 
 function selectMenuOption(selection)
   if m.MenuOptions.content.getChild(selection.getData()).title = "Browse"
@@ -64,6 +77,7 @@ function selectEpisode(selection)
   source = "https://twist.moe" + decryptSource(source_encrypted)
 
   m.VideoOverlay.videoUrl = source
+  m.VideoOverlay.needsReinitialize = true
   m.VideoOverlay.visible = true
   m.VideoActions.setFocus(true)
 end function
@@ -114,7 +128,7 @@ sub scrollLeft() as Boolean
 end sub
 
 function onKeyEvent(key as String, press as Boolean) as Boolean
-  print "Key pressed: "; key; " "; press
+  print "AnimeSelector: Key pressed: "; key; " "; press
   if press = true
     if key = "left"
       scrollLeft()
@@ -122,6 +136,17 @@ function onKeyEvent(key as String, press as Boolean) as Boolean
     else if key = "right"
       scrollRight()
       return true
+    end if
+    if key = "back"
+      if m.VideoOverlay.visible = true
+        m.VideoOverlay.visible = false
+        m.EpisodeList.setFocus(true)
+        return true
+      else
+        m.ExitWarning.visible = true
+        m.ExitWarning.setFocus(true)
+        return true
+      end if
     end if
   end if
   return false

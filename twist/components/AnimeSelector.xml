@@ -25,11 +25,21 @@
       visible = "false">
       <ContentNode role="content"></ContentNode>
     </LabelList>
+    <Dialog
+      id = "ExitWarning"
+      visible = "false"
+      title = "Bye bye"
+      message = "Press OK to exit AnimeTwist"
+    />
     <VideoOverlay
       id = "VideoOverlay"
       visible = "false"
     />
   </children>
+
+  <interface>
+    <field id="exit" type="boolean" value="false" />
+  </interface>
 
   <script type="text/brightscript" uri="pkg:/components/sourceDecrypt.brs"/>
   <script type="text/brightscript" uri="pkg:/components/AnimeSelector.brs"/>

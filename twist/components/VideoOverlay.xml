@@ -15,7 +15,7 @@
         translation="[400,300]"
         itemSize="[480,48]" >
         <ContentNode role="content" >
-          <ContentNode title="Play" />
+          <ContentNode title="Play From Start" />
         </ContentNode>
       </LabelList>
     </Group>
@@ -30,6 +30,7 @@
 
   <interface>
     <field id="videoUrl" type="string" />
+    <field id="needsReinitialize" type="boolean" onChange="reinitialize" />
   </interface>
 
   <script type="text/brightscript" uri="VideoOverlay.brs" />
