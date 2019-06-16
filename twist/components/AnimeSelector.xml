@@ -7,7 +7,7 @@
       itemSize = "[300,80]"
       visible = "true">
       <ContentNode role="content">
-        <ContentNode title="Browse" />
+        <ContentNode title="Browse All" />
         <ContentNode title="Search" />
       </ContentNode>
     </LabelList>
@@ -25,6 +25,11 @@
       visible = "false">
       <ContentNode role="content"></ContentNode>
     </LabelList>
+    <MiniKeyboard
+      id = "SearchInput"
+      translation = "[60, 250]"
+      scale = "[0.8, 0.8]"
+      visible = "false" />
     <Dialog
       id = "ExitWarning"
       visible = "false"

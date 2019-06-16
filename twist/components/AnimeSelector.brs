@@ -1,6 +1,10 @@
 sub init()
+  m.top.backgroundUri = ""
+  m.top.backgroundColor = "0x000000FF"
+
   ' AnimeSelector nodes
   m.MenuOptions = m.top.findNode("MenuOptions")
+  m.MenuOptions.vertFocusAnimationStyle = "floatingFocus"
   m.AnimeList = m.top.findNode("AnimeList")
   m.AnimeList.observeField("itemSelected", "selectAnime")
   m.EpisodeList = m.top.findNode("EpisodeList")
@@ -8,6 +12,8 @@ sub init()
   m.ExitWarning = m.top.findNode("ExitWarning")
   m.ExitWarning.buttons = ["OK", "Cancel"]
   m.ExitWarning.observeField("buttonSelected", "maybeExit")
+  m.SearchInput = m.top.findNode("SearchInput")
+  m.SearchInput.observeField("text", "updateAnimeListEntries")
 
   ' VideoOverlay nodes
   m.VideoOverlay = m.top.findNode("VideoOverlay")
@@ -41,14 +47,26 @@ sub maybeExit(selection)
 end sub
 
 sub selectMenuOption(selection)
-  if m.MenuOptions.content.getChild(selection.getData()).title = "Browse"
+  selectedText = m.MenuOptions.content.getChild(selection.getData()).title
+  if selectedText = "Browse All"
     m.MenuOptions.setFocus(false)
     if m.AnimeListPopulated = false
       m.AnimeListWaiting = true
     else
       showAnimeList()
     end if
+  else if selectedText = "Search"
+    if m.AnimeListPopulated = false
+      m.AnimeListWaiting = true
+    end if
+    m.SearchInput.visible = true
+    m.SearchInput.setFocus(true)
   end if
+end sub
+
+sub updateAnimeListEntries(searchQuery)
+  searchText = searchQuery.getData()
+  print searchText
 end sub
 
 sub fetchAnimeList()
@@ -63,9 +81,13 @@ sub fetchAnimeList()
 end sub
 
 sub populateAnimeListContent()
-  m.AnimeArray = m.getAnimeList.response
-  accumulateContentNodes(m.AnimeList.content, m.AnimeArray)
-  m.AnimeListPopulated = true
+  if m.AnimeListPopulated = false
+    m.AnimeArray = m.getAnimeList.response
+    accumulateContentNodes(m.AnimeList.content, m.AnimeArray)
+    m.AnimeListPopulated = true
+  else  ' re-populate content, don't need to do anything else
+    accumulateContentNodes(m.AnimeList.content, m.AnimeArray)
+  end if
 
   if m.AnimeListWaiting = true
     showAnimeList()
@@ -180,6 +202,10 @@ function onKeyEvent(key as String, press as Boolean) as Boolean
       if m.VideoOverlay.visible = true
         m.VideoOverlay.visible = false
         m.EpisodeList.setFocus(true)
+        return true
+      else if m.SearchInput.visible = true
+        m.SearchInput.visible = false
+        focusMenuOptions()
         return true
       else
         m.ExitWarning.visible = true
