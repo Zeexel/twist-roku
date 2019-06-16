@@ -2,7 +2,9 @@ sub init()
   ' AnimeSelector nodes
   m.MenuOptions = m.top.findNode("MenuOptions")
   m.AnimeList = m.top.findNode("AnimeList")
+  m.AnimeList.observeField("itemSelected", "selectAnime")
   m.EpisodeList = m.top.findNode("EpisodeList")
+  m.EpisodeList.observeField("itemSelected", "selectEpisode")
   m.ExitWarning = m.top.findNode("ExitWarning")
   m.ExitWarning.buttons = ["OK", "Cancel"]
   m.ExitWarning.observeField("buttonSelected", "maybeExit")
@@ -12,6 +14,10 @@ sub init()
   m.VideoActions = m.top.findNode("VideoActions")
 
   m.currentList = "MenuOptions"
+  m.AnimeListPopulated = false
+  m.AnimeListWaiting = false
+
+  fetchAnimeList()
 
   ' note: m.AnimeArray and m.EpisodeArray are set upon AnimeList and EpisodeList loading
 
@@ -19,7 +25,7 @@ sub init()
   m.MenuOptions.setFocus(true)
 end sub
 
-function maybeExit(selection)
+sub maybeExit(selection)
   if m.ExitWarning.buttons[selection.getData()] = "OK"
     m.top.exit = true
   else
@@ -32,35 +38,41 @@ function maybeExit(selection)
       m.EpisodeList.setFocus(true)
     end if
   end if
-end function
+end sub
 
-function selectMenuOption(selection)
+sub selectMenuOption(selection)
   if m.MenuOptions.content.getChild(selection.getData()).title = "Browse"
     m.MenuOptions.setFocus(false)
-    populateAnimeList()
+    if m.AnimeListPopulated = false
+      m.AnimeListWaiting = true
+    else
+      showAnimeList()
+    end if
   end if
-end function
+end sub
 
-sub populateAnimeList()
+sub fetchAnimeList()
   print "Trying to populate anime list!"
 
   m.getAnimeList = createObject("roSGNode", "twistApiCall")
   m.getAnimeList.setField("url", "https://twist.moe/api/anime")
   m.getAnimeList.setField("token", "1rj2vRtegS8Y60B3w3qNZm5T2Q0TN2NR")
   m.getAnimeList.setField("title_field", "title")
-  m.getAnimeList.observeField("response", "showAnimeList")
+  m.getAnimeList.observeField("response", "populateAnimeListContent")
   m.getAnimeList.control = "RUN"
 end sub
 
-sub showAnimeList()
+sub populateAnimeListContent()
   m.AnimeArray = m.getAnimeList.response
   accumulateContentNodes(m.AnimeList.content, m.AnimeArray)
-  m.AnimeList.visible = true
-  focusAnimeList()
-  m.AnimeList.observeField("itemSelected", "selectAnime")
+  m.AnimeListPopulated = true
+
+  if m.AnimeListWaiting = true
+    showAnimeList()
+  end if
 end sub
 
-function selectAnime(selection)
+sub selectAnime(selection)
   print "Trying to populate episode list for selected anime!"
 
   currentAnimeSlug = findItemFromLabelList(m.AnimeList, selection.getData(), m.AnimeArray).slug.slug
@@ -72,17 +84,16 @@ function selectAnime(selection)
   m.getAnimeEpisodes.setField("title_prefix", "Episode ")
   m.getAnimeEpisodes.observeField("response", "showEpisodeList")
   m.getAnimeEpisodes.control = "RUN"
-end function
+end sub
 
 sub showEpisodeList()
   m.EpisodeArray = m.getAnimeEpisodes.response
   accumulateContentNodes(m.EpisodeList.content, m.EpisodeArray)
   m.EpisodeList.visible = true
   focusEpisodeList()
-  m.EpisodeList.observeField("itemSelected", "selectEpisode")
 end sub
 
-function selectEpisode(selection)
+sub selectEpisode(selection)
   source_encrypted = findItemFromLabelList(m.EpisodeList, selection.getData(), m.EpisodeArray).source
   source = "https://twist.moe" + decryptSource(source_encrypted)
 
@@ -90,7 +101,7 @@ function selectEpisode(selection)
   m.VideoOverlay.needsReinitialize = true
   m.VideoOverlay.visible = true
   m.VideoActions.setFocus(true)
-end function
+end sub
 
 function focusOccupied() as Boolean
   if m.ExitWarning.visible = true
@@ -104,6 +115,11 @@ sub focusMenuOptions()
   if focusOccupied() = false
     m.MenuOptions.setFocus(true)
   end if
+end sub
+
+sub showAnimeList()
+  m.AnimeList.visible = true
+  focusAnimeList()
 end sub
 
 sub focusAnimeList()
@@ -120,7 +136,7 @@ sub focusEpisodeList()
   end if
 end sub
 
-sub scrollRight() as Boolean
+function scrollRight() as Boolean
   if m.currentList = "MenuOptions"
     if m.AnimeList.visible = false
       return false
@@ -136,9 +152,9 @@ sub scrollRight() as Boolean
     return true
   end if
   return false
-end sub
+end function
 
-sub scrollLeft() as Boolean
+function scrollLeft() as Boolean
   if m.currentList = "AnimeList"
     focusMenuOptions()
     return true
@@ -148,7 +164,7 @@ sub scrollLeft() as Boolean
     return true
   end if
   return false
-end sub
+end function
 
 function onKeyEvent(key as String, press as Boolean) as Boolean
   print "AnimeSelector: Key pressed: "; key; " "; press
