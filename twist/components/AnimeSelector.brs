@@ -20,8 +20,10 @@ sub init()
   m.VideoActions = m.top.findNode("VideoActions")
 
   m.currentList = "MenuOptions"
-  m.AnimeListPopulated = false
-  m.AnimeListWaiting = false
+  m.animeListPopulated = false
+  m.animeListWaiting = false
+  m.searchInProgress = false
+  m.previousSearch = ""
 
   fetchAnimeList()
 
@@ -50,14 +52,17 @@ sub selectMenuOption(selection)
   selectedText = m.MenuOptions.content.getChild(selection.getData()).title
   if selectedText = "Browse All"
     m.MenuOptions.setFocus(false)
-    if m.AnimeListPopulated = false
-      m.AnimeListWaiting = true
+    m.SearchInput.text = ""
+    if m.animeListPopulated = false
+      m.animeListWaiting = true
     else
       showAnimeList()
     end if
   else if selectedText = "Search"
-    if m.AnimeListPopulated = false
-      m.AnimeListWaiting = true
+    if m.animeListPopulated = false
+      m.animeListWaiting = true
+    else
+      m.AnimeList.visible = true
     end if
     m.SearchInput.visible = true
     m.SearchInput.setFocus(true)
@@ -65,8 +70,17 @@ sub selectMenuOption(selection)
 end sub
 
 sub updateAnimeListEntries(searchQuery)
-  searchText = searchQuery.getData()
-  print searchText
+  if m.animeListPopulated = false or m.searchInProgress = true
+    return
+  end if
+
+  if type(searchQuery) = "String" or type(searchQuery) = "roString"
+    searchText = searchQuery
+  else
+    searchText = searchQuery.getData()
+  end if
+  searchAndFillContent(searchText, m.previousSearch, m.AnimeArray, m.AnimeList)
+  m.previousSearch = searchText
 end sub
 
 sub fetchAnimeList()
@@ -81,17 +95,21 @@ sub fetchAnimeList()
 end sub
 
 sub populateAnimeListContent()
-  if m.AnimeListPopulated = false
+  if m.animeListPopulated = false
     m.AnimeArray = m.getAnimeList.response
-    accumulateContentNodes(m.AnimeList.content, m.AnimeArray)
-    m.AnimeListPopulated = true
+    accumulateContentNodes(m.AnimeList, m.AnimeArray)
+    m.animeListPopulated = true
+    if m.animeListWaiting = true
+      if m.SearchInput.visible = true and len(m.SearchInput.text) > 0
+        updateAnimeListEntries(m.SearchInput.text)
+      end if
+      showAnimeList()
+      m.animeListWaiting = false
+    end if
   else  ' re-populate content, don't need to do anything else
-    accumulateContentNodes(m.AnimeList.content, m.AnimeArray)
+    accumulateContentNodes(m.AnimeList, m.AnimeArray)
   end if
 
-  if m.AnimeListWaiting = true
-    showAnimeList()
-  end if
 end sub
 
 sub selectAnime(selection)
@@ -110,7 +128,7 @@ end sub
 
 sub showEpisodeList()
   m.EpisodeArray = m.getAnimeEpisodes.response
-  accumulateContentNodes(m.EpisodeList.content, m.EpisodeArray)
+  accumulateContentNodes(m.EpisodeList, m.EpisodeArray)
   m.EpisodeList.visible = true
   focusEpisodeList()
 end sub
@@ -127,6 +145,8 @@ end sub
 
 function focusOccupied() as Boolean
   if m.ExitWarning.visible = true
+    return true
+  else if m.SearchInput.visible = true
     return true
   end if
   return false
