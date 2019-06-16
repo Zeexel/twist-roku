@@ -92,19 +92,32 @@ function selectEpisode(selection)
   m.VideoActions.setFocus(true)
 end function
 
+function focusOccupied() as Boolean
+  if m.ExitWarning.visible = true
+    return true
+  end if
+  return false
+end function
+
 sub focusMenuOptions()
   m.currentList = "MenuOptions"
-  m.MenuOptions.setFocus(true)
+  if focusOccupied() = false
+    m.MenuOptions.setFocus(true)
+  end if
 end sub
 
 sub focusAnimeList()
   m.currentList = "AnimeList"
-  m.AnimeList.setFocus(true)
+  if focusOccupied() = false
+    m.AnimeList.setFocus(true)
+  end if
 end sub
 
 sub focusEpisodeList()
   m.currentList = "EpisodeList"
-  m.EpisodeList.setFocus(true)
+  if focusOccupied() = false
+    m.EpisodeList.setFocus(true)
+  end if
 end sub
 
 sub scrollRight() as Boolean
