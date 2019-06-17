@@ -96,7 +96,7 @@ end sub
 
 sub populateAnimeListContent()
   if m.animeListPopulated = false
-    m.AnimeArray = m.getAnimeList.response
+    m.AnimeArray = pruneHiddenFromArray(m.getAnimeList.response)
     accumulateContentNodes(m.AnimeList, m.AnimeArray)
     m.animeListPopulated = true
     if m.animeListWaiting = true

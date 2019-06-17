@@ -74,3 +74,16 @@ end sub
 function createEmptyContent() as Object
   return createObject("RoSGNode", "ContentNode")
 end function
+
+function pruneHiddenFromArray(myArray as Object) as Object
+  idx = 0
+  while idx < myArray.count()
+    itemHidden = myArray[idx].lookup("hidden")
+    if itemHidden = invalid or itemHidden = 1
+      myArray.delete(idx)
+    else
+      idx++
+    end if
+  end while
+  return myArray
+end function
