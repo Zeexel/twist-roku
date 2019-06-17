@@ -33,14 +33,16 @@ function arrayInArray(arrayOne, arrayTwo) as boolean
   for each toMatch in arrayOne
     toMatchLower = lCase(toMatch)
     toMatchLen = len(toMatch)
+    foundMatch = false
     for each toContain in arrayTwo
-      toContainLen = len(toContain)
-      if toMatchLen > toContainLen
-        return false
-      else if toMatchLower <> left(lCase(toContain), toMatchLen)
-        return false
+      if toMatchLen <= len(toContain) and toMatchLower = left(lCase(toContain), toMatchLen)
+        foundMatch = true
+        exit for
       end if
     end for
+    if foundMatch = false
+      return false
+    end if
   end for
   return true
 end function
